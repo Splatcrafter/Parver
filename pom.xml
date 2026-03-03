@@ -7,11 +7,25 @@
     <groupId>de.splatgames.software.external.afbb</groupId>
     <artifactId>parver</artifactId>
     <version>0.1.0</version>
+    <packaging>pom</packaging>
+
+    <name>ParVer - Parkplatz-Verwaltungssystem</name>
+
+    <modules>
+        <module>parver-frontend</module>
+        <module>parver-backend</module>
+    </modules>
 
     <properties>
+        <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <spring-boot.version>3.4.13</spring-boot.version>
+        <node.version>v22.14.0</node.version>
+        <frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
+        <openapi-generator.version>7.12.0</openapi-generator.version>
     </properties>
 
 </project>

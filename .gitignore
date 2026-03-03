@@ -47,6 +47,18 @@ bin/
 /target/
 **/target/
 
+# Node.js / Frontend
+**/node_modules/
+**/node/
+**/dist/
+*.tgz
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
 # Claude Code
 /.claude/
 /CLAUDE.md
