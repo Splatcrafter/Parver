@@ -1,20 +1,14 @@
 import { Routes, Route } from "react-router-dom"
-
-function HomePage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">ParVer</h1>
-        <p className="mt-2 text-muted-foreground">Parkplatzverwaltungssystem</p>
-      </div>
-    </div>
-  )
-}
+import HomePage from "@/pages/HomePage"
+import ErrorPage from "@/pages/ErrorPage"
+import PlaceholderPage from "@/pages/PlaceholderPage"
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/platzhalter" element={<PlaceholderPage title="Platzhalter" />} />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   )
 }
