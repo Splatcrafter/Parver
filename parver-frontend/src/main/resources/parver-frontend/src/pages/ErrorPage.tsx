@@ -59,7 +59,7 @@ export default function ErrorPage({ statusCode = 404, message }: ErrorPageProps)
           {statusCode}
         </p>
 
-        <h1 className="-mt-4 text-2xl font-bold tracking-tight">
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">
           {config.title}
         </h1>
 
