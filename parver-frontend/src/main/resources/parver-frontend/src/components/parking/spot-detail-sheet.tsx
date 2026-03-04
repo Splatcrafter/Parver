@@ -9,10 +9,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ReleaseForm } from "@/components/parking/release-form"
 import { BookingForm } from "@/components/parking/booking-form"
+import { ReportDialog } from "@/components/parking/report-dialog"
 import { useAuth } from "@/hooks/use-auth"
 import { parkingApi } from "@/lib/api"
 import type { components } from "@/lib/api-types"
-import { Trash2 } from "lucide-react"
+import { Flag, Trash2 } from "lucide-react"
 
 type ParkingSpace = components["schemas"]["ParkingSpace"]
 type ParkingSpotRelease = components["schemas"]["ParkingSpotRelease"]
@@ -49,6 +50,7 @@ function formatDateTime(iso: string): string {
 export function SpotDetailSheet({ spot, onClose }: SpotDetailSheetProps) {
   const { user } = useAuth()
   const [liveSpot, setLiveSpot] = useState<ParkingSpace | null>(spot)
+  const [reportOpen, setReportOpen] = useState(false)
 
   const isOwner = user && spot && spot.ownerId === user.id
   const canBook = user && user.parkingSpotNumber === null && !isOwner
@@ -182,7 +184,30 @@ export function SpotDetailSheet({ spot, onClose }: SpotDetailSheetProps) {
                 />
               </div>
             )}
+
+            {/* Report misuse button for non-owners on available/booked spots */}
+            {!isOwner && (liveSpot.status === "AVAILABLE" || liveSpot.status === "BOOKED") && (
+              <div className="border-t pt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setReportOpen(true)}
+                >
+                  <Flag className="h-4 w-4" />
+                  Fehlbelegung melden
+                </Button>
+              </div>
+            )}
           </div>
+        )}
+
+        {liveSpot && (
+          <ReportDialog
+            spotNumber={reportOpen ? liveSpot.spotNumber : null}
+            onOpenChange={(open) => { if (!open) setReportOpen(false) }}
+            onReported={() => setReportOpen(false)}
+          />
         )}
       </DialogContent>
     </Dialog>

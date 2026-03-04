@@ -96,6 +96,22 @@ export const parkingApi = {
     }),
 }
 
+export const reportsApi = {
+  create: (spotNumber: number, comment?: string) =>
+    apiClient.fetch(`/parking-spaces/${spotNumber}/reports`, {
+      method: "POST",
+      body: JSON.stringify({ comment: comment || undefined }),
+    }),
+
+  getAll: () => apiClient.fetch("/reports"),
+
+  updateStatus: (reportId: number, status: "RESOLVED" | "DISMISSED") =>
+    apiClient.fetch(`/reports/${reportId}`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
+}
+
 export const usersApi = {
   getAll: () => apiClient.fetch("/users"),
 

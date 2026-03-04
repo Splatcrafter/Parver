@@ -3,10 +3,12 @@ package de.splatgames.software.external.afbb.parver.parking;
 import de.splatgames.software.external.afbb.parver.api.ParkingApiDelegate;
 import de.splatgames.software.external.afbb.parver.model.CreateBookingRequest;
 import de.splatgames.software.external.afbb.parver.model.CreateReleaseRequest;
+import de.splatgames.software.external.afbb.parver.model.CreateReportRequest;
 import de.splatgames.software.external.afbb.parver.model.ErrorResponse;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpace;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpotBooking;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpotRelease;
+import de.splatgames.software.external.afbb.parver.model.ParkingSpotReport;
 import de.splatgames.software.external.afbb.parver.user.UserEntity;
 import de.splatgames.software.external.afbb.parver.user.UserService;
 import org.jetbrains.annotations.NotNull;
@@ -130,6 +132,22 @@ public class ParkingApiDelegateImpl implements ParkingApiDelegate {
         } catch (final NoSuchElementException e) {
             return errorResponse(HttpStatus.NOT_FOUND,
                     "Nicht gefunden", "Die Buchung wurde nicht gefunden.");
+        }
+    }
+
+    @Override
+    public ResponseEntity<ParkingSpotReport> createReport(
+            @NotNull final Integer spotNumber,
+            @NotNull final CreateReportRequest request) {
+        try {
+            final long userId = getAuthenticatedUserId();
+            final ParkingSpotReportEntity report = this.parkingSpotService.createReport(
+                    spotNumber, userId, request.getComment());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ParkingSpotMapper.toReportResponse(report));
+        } catch (final NoSuchElementException e) {
+            return errorResponse(HttpStatus.NOT_FOUND,
+                    "Nicht gefunden", "Der Parkplatz wurde nicht gefunden.");
         }
     }
 

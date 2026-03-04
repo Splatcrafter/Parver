@@ -130,11 +130,79 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all parking spaces */
+        /** Get all parking spaces with current status */
         get: operations["getParkingSpaces"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/parking-spaces/{spotNumber}/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Release a parking spot for a time period (owner only) */
+        post: operations["createRelease"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/parking-spaces/{spotNumber}/releases/{releaseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Cancel a release (owner only, cascades bookings) */
+        delete: operations["deleteRelease"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/parking-spaces/{spotNumber}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Book a released parking spot (non-owners only) */
+        post: operations["createBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/parking-spaces/{spotNumber}/bookings/{bookingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Cancel a booking (booker or admin) */
+        delete: operations["deleteBooking"];
         options?: never;
         head?: never;
         patch?: never;
@@ -172,6 +240,57 @@ export interface paths {
         post?: never;
         /** Delete a user (admin only) */
         delete: operations["deleteUser"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/parking-spaces/{spotNumber}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report a parking spot misuse (any authenticated user) */
+        post: operations["createReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all parking spot reports (admin only) */
+        get: operations["getReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{reportId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update report status (admin only) */
+        put: operations["updateReportStatus"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -217,6 +336,7 @@ export interface components {
             displayName: string;
             /** @enum {string} */
             role: "ADMIN" | "USER";
+            /** @description Spot number assigned to this user (null if none) */
             parkingSpotNumber?: number | null;
         };
         CreateUserRequest: {
@@ -225,6 +345,7 @@ export interface components {
             password: string;
             /** @enum {string} */
             role: "ADMIN" | "USER";
+            /** @description Parking spot number to assign (null to not assign) */
             parkingSpotNumber?: number | null;
         };
         UpdateUserRequest: {
@@ -233,6 +354,7 @@ export interface components {
             password?: string;
             /** @enum {string} */
             role: "ADMIN" | "USER";
+            /** @description Parking spot number to assign (null to unassign) */
             parkingSpotNumber?: number | null;
         };
         SetupStatusResponse: {
@@ -254,13 +376,29 @@ export interface components {
             password: string;
         };
         ParkingSpace: {
+            /**
+             * @description Physical spot number (unique identifier)
+             * @example 53
+             */
             spotNumber: number;
-            /** @enum {string} */
+            /**
+             * @description Current computed status of the parking spot
+             * @enum {string}
+             */
             status: "INACTIVE" | "OCCUPIED" | "AVAILABLE" | "BOOKED";
+            /**
+             * @description Display name of the owner (null if INACTIVE)
+             * @example Max Mustermann
+             */
             ownerDisplayName?: string | null;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description ID of the owner (null if INACTIVE)
+             */
             ownerId?: number | null;
+            /** @description Display name of the current booker (only when status is BOOKED) */
             currentBookerDisplayName?: string | null;
+            /** @description Current and future releases for this spot */
             activeReleases?: components["schemas"]["ParkingSpotRelease"][];
         };
         ParkingSpotRelease: {
@@ -298,6 +436,27 @@ export interface components {
             bookedFrom: string;
             /** Format: date-time */
             bookedTo: string;
+        };
+        CreateReportRequest: {
+            /** @description Optional comment about the misuse */
+            comment?: string;
+        };
+        ParkingSpotReport: {
+            /** Format: int64 */
+            id: number;
+            spotNumber: number;
+            reporterDisplayName: string;
+            /** Format: int64 */
+            reporterId: number;
+            comment?: string | null;
+            /** @enum {string} */
+            status: "OPEN" | "RESOLVED" | "DISMISSED";
+            /** Format: date-time */
+            createdAt: string;
+        };
+        UpdateReportStatusRequest: {
+            /** @enum {string} */
+            status: "RESOLVED" | "DISMISSED";
         };
     };
     responses: never;
@@ -547,6 +706,172 @@ export interface operations {
             };
         };
     };
+    createRelease: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotNumber: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReleaseRequest"];
+            };
+        };
+        responses: {
+            /** @description Release created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParkingSpotRelease"];
+                };
+            };
+            /** @description Validation error (e.g. overlapping release) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not the owner of this spot */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteRelease: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotNumber: number;
+                releaseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Release deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not the owner of this spot */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Release not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotNumber: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBookingRequest"];
+            };
+        };
+        responses: {
+            /** @description Booking created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParkingSpotBooking"];
+                };
+            };
+            /** @description Validation error (e.g. overbooking, outside release window) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description User has own parking spot (cannot book) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotNumber: number;
+                bookingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Booking cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not authorized to cancel this booking */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Booking not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getUsers: {
         parameters: {
             query?: never;
@@ -703,6 +1028,105 @@ export interface operations {
                 content?: never;
             };
             /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotNumber: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReportRequest"];
+            };
+        };
+        responses: {
+            /** @description Report created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParkingSpotReport"];
+                };
+            };
+            /** @description Parking spot not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getReports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of all reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParkingSpotReport"][];
+                };
+            };
+            /** @description Not authorized */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateReportStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReportStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Report updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParkingSpotReport"];
+                };
+            };
+            /** @description Report not found */
             404: {
                 headers: {
                     [name: string]: unknown;

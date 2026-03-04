@@ -1,6 +1,7 @@
 package de.splatgames.software.external.afbb.parver.parking;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,4 +49,13 @@ public interface ParkingSpotService {
     // Status computation
     @NotNull
     ParkingSpotStatus computeStatus(@NotNull ParkingSpotEntity spot, @NotNull LocalDateTime now);
+
+    // Report management
+    @NotNull
+    ParkingSpotReportEntity createReport(int spotNumber, long reporterId, @Nullable String comment);
+
+    @NotNull
+    java.util.List<ParkingSpotReportEntity> getAllReports();
+
+    void updateReportStatus(long reportId, @NotNull ReportStatus status);
 }

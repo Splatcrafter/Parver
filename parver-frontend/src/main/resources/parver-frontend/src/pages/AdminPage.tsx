@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowLeft, LogOut, Pencil, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Flag, LogOut, Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -84,7 +84,13 @@ export default function AdminPage() {
       </div>
 
       {/* Actions */}
-      <div className="mt-6 flex w-full max-w-4xl justify-end">
+      <div className="mt-6 flex w-full max-w-4xl justify-between">
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/administration/reports">
+            <Flag className="h-4 w-4" />
+            Meldungen
+          </Link>
+        </Button>
         <Button size="sm" onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4" />
           Benutzer erstellen

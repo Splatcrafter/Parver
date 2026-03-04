@@ -3,6 +3,7 @@ package de.splatgames.software.external.afbb.parver.parking;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpace;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpotBooking;
 import de.splatgames.software.external.afbb.parver.model.ParkingSpotRelease;
+import de.splatgames.software.external.afbb.parver.model.ParkingSpotReport;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -93,5 +94,18 @@ public final class ParkingSpotMapper {
     @NotNull
     public static LocalDateTime toAppLocalDateTime(@NotNull final OffsetDateTime odt) {
         return odt.atZoneSameInstant(APP_ZONE).toLocalDateTime();
+    }
+
+    @NotNull
+    public static ParkingSpotReport toReportResponse(
+            @NotNull final ParkingSpotReportEntity entity) {
+        return new ParkingSpotReport()
+                .id(entity.getId())
+                .spotNumber(entity.getParkingSpot().getSpotNumber())
+                .reporterDisplayName(entity.getReporter().getDisplayName())
+                .reporterId(entity.getReporter().getId())
+                .comment(entity.getComment())
+                .status(ParkingSpotReport.StatusEnum.valueOf(entity.getStatus().name()))
+                .createdAt(entity.getCreatedAt().atZone(APP_ZONE).toOffsetDateTime());
     }
 }

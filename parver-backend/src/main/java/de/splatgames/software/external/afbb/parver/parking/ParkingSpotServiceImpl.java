@@ -3,6 +3,7 @@ package de.splatgames.software.external.afbb.parver.parking;
 import de.splatgames.software.external.afbb.parver.user.UserEntity;
 import de.splatgames.software.external.afbb.parver.user.UserRepository;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +19,19 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
     private final ParkingSpotRepository parkingSpotRepository;
     private final ParkingSpotReleaseRepository releaseRepository;
     private final ParkingSpotBookingRepository bookingRepository;
+    private final ParkingSpotReportRepository reportRepository;
     private final UserRepository userRepository;
 
     public ParkingSpotServiceImpl(
             @NotNull final ParkingSpotRepository parkingSpotRepository,
             @NotNull final ParkingSpotReleaseRepository releaseRepository,
             @NotNull final ParkingSpotBookingRepository bookingRepository,
+            @NotNull final ParkingSpotReportRepository reportRepository,
             @NotNull final UserRepository userRepository) {
         this.parkingSpotRepository = parkingSpotRepository;
         this.releaseRepository = releaseRepository;
         this.bookingRepository = bookingRepository;
+        this.reportRepository = reportRepository;
         this.userRepository = userRepository;
     }
 
@@ -230,5 +234,36 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
                 .anyMatch(b -> b.containsTime(now));
 
         return isBooked ? ParkingSpotStatus.BOOKED : ParkingSpotStatus.AVAILABLE;
+    }
+
+    // --- Report management ---
+
+    @Override
+    @NotNull
+    public ParkingSpotReportEntity createReport(final int spotNumber, final long reporterId,
+                                                 @Nullable final String comment) {
+        final ParkingSpotEntity spot = this.parkingSpotRepository.findById(spotNumber)
+                .orElseThrow(() -> new NoSuchElementException("Parking spot not found: " + spotNumber));
+
+        final UserEntity reporter = this.userRepository.findById(reporterId)
+                .orElseThrow(() -> new NoSuchElementException("User not found: " + reporterId));
+
+        final var report = new ParkingSpotReportEntity(spot, reporter, comment);
+        return this.reportRepository.save(report);
+    }
+
+    @Override
+    @NotNull
+    @Transactional(readOnly = true)
+    public List<ParkingSpotReportEntity> getAllReports() {
+        return this.reportRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
+    public void updateReportStatus(final long reportId, @NotNull final ReportStatus status) {
+        final ParkingSpotReportEntity report = this.reportRepository.findById(reportId)
+                .orElseThrow(() -> new NoSuchElementException("Report not found: " + reportId));
+        report.setStatus(status);
+        this.reportRepository.save(report);
     }
 }
