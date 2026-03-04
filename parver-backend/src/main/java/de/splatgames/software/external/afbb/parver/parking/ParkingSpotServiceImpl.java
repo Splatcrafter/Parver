@@ -84,6 +84,20 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
         this.parkingSpotRepository.save(spot);
     }
 
+    @Override
+    public void clearSpotData(final int spotNumber) {
+        final List<ParkingSpotReleaseEntity> releases =
+                this.releaseRepository.findByParkingSpotSpotNumber(spotNumber);
+        this.releaseRepository.deleteAll(releases); // cascades to bookings via orphanRemoval
+    }
+
+    @Override
+    public void deleteBookingsByUser(final long userId) {
+        final List<ParkingSpotBookingEntity> bookings =
+                this.bookingRepository.findByBookedById(userId);
+        this.bookingRepository.deleteAll(bookings);
+    }
+
     // --- Release management ---
 
     @Override

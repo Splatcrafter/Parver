@@ -37,7 +37,7 @@ export function CreateUserDialog({
   const [displayName, setDisplayName] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState<"ADMIN" | "USER">("USER")
-  const [parkingSpot, setParkingSpot] = useState<string>("")
+  const [parkingSpot, setParkingSpot] = useState<string>("none")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -47,7 +47,7 @@ export function CreateUserDialog({
       setDisplayName("")
       setPassword("")
       setRole("USER")
-      setParkingSpot("")
+      setParkingSpot("none")
       setError(null)
     }
   }, [open])
@@ -68,7 +68,7 @@ export function CreateUserDialog({
         displayName: displayName.trim(),
         password,
         role,
-        parkingSpotNumber: parkingSpot === "" ? null : parseInt(parkingSpot),
+        parkingSpotNumber: parkingSpot === "none" ? null : parseInt(parkingSpot),
       })
       if (response.status === 201 || response.ok) {
         onOpenChange(false)
@@ -144,7 +144,7 @@ export function CreateUserDialog({
                 <SelectValue placeholder="Kein Parkplatz" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Kein Parkplatz</SelectItem>
+                <SelectItem value="none">Kein Parkplatz</SelectItem>
                 {availableSpots.map((s) => (
                   <SelectItem key={s} value={String(s)}>
                     Parkplatz {s}

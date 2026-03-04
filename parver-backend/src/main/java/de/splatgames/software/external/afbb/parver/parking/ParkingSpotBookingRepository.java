@@ -18,4 +18,7 @@ public interface ParkingSpotBookingRepository extends JpaRepository<ParkingSpotB
     List<ParkingSpotBookingEntity> findOverlapping(@Param("releaseId") long releaseId,
                                                     @NotNull @Param("from") LocalDateTime from,
                                                     @NotNull @Param("to") LocalDateTime to);
+
+    @NotNull
+    List<ParkingSpotBookingEntity> findByBookedById(long userId);
 }

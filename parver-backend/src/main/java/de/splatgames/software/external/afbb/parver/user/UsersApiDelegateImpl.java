@@ -102,9 +102,15 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     @Override
     public ResponseEntity<Void> deleteUser(@NotNull final Long userId) {
         try {
-            // Unassign parking spot before deleting
+            // Delete all bookings this user made on other spots
+            this.parkingSpotService.deleteBookingsByUser(userId);
+
+            // Delete all releases (+ cascaded bookings) for the user's own spot, then unassign
             this.parkingSpotService.findByOwnerId(userId)
-                    .ifPresent(spot -> this.parkingSpotService.removeOwner(spot.getSpotNumber()));
+                    .ifPresent(spot -> {
+                        this.parkingSpotService.clearSpotData(spot.getSpotNumber());
+                        this.parkingSpotService.removeOwner(spot.getSpotNumber());
+                    });
 
             this.userService.deleteUser(userId);
             return ResponseEntity.noContent().build();

@@ -41,7 +41,7 @@ export function EditUserDialog({
   const [displayName, setDisplayName] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState<"ADMIN" | "USER">("USER")
-  const [parkingSpot, setParkingSpot] = useState<string>("")
+  const [parkingSpot, setParkingSpot] = useState<string>("none")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -52,7 +52,7 @@ export function EditUserDialog({
       setDisplayName(user.displayName)
       setPassword("")
       setRole(user.role)
-      setParkingSpot(user.parkingSpotNumber != null ? String(user.parkingSpotNumber) : "")
+      setParkingSpot(user.parkingSpotNumber != null ? String(user.parkingSpotNumber) : "none")
       setError(null)
     }
   }, [user])
@@ -77,7 +77,7 @@ export function EditUserDialog({
       } = {
         displayName: displayName.trim(),
         role,
-        parkingSpotNumber: parkingSpot === "" ? null : parseInt(parkingSpot),
+        parkingSpotNumber: parkingSpot === "none" ? null : parseInt(parkingSpot),
       }
       if (password.trim()) {
         data.password = password
@@ -163,7 +163,7 @@ export function EditUserDialog({
                 <SelectValue placeholder="Kein Parkplatz" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Kein Parkplatz</SelectItem>
+                <SelectItem value="none">Kein Parkplatz</SelectItem>
                 {availableSpots.map((s) => (
                   <SelectItem key={s} value={String(s)}>
                     Parkplatz {s}

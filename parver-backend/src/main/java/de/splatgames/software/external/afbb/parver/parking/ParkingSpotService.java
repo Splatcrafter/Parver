@@ -24,6 +24,10 @@ public interface ParkingSpotService {
 
     void removeOwner(int spotNumber);
 
+    void clearSpotData(int spotNumber);
+
+    void deleteBookingsByUser(long userId);
+
     // Release management
     @NotNull
     ParkingSpotReleaseEntity createRelease(int spotNumber, long userId,
