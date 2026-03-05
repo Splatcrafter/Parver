@@ -28,11 +28,8 @@
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
 - [API Reference](#api-reference)
-- [Project Structure](#project-structure)
 - [Development](#development)
 - [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
 - [License & Acknowledgments](#license--acknowledgments)
 
 ---
@@ -332,66 +329,6 @@ The OpenAPI 3.0 specification is located at:
 ```
 parver-frontend/src/main/resources/openapi-specification/parver-api.yaml
 ```
-
-### Authentication
-
-| Method | Endpoint                 | Description                          | Auth   |
-|--------|--------------------------|--------------------------------------|--------|
-| `POST` | `/api/auth/login`        | Authenticate with username/password  | Public |
-| `POST` | `/api/auth/refresh`      | Refresh an expired access token      | Public |
-| `GET`  | `/api/auth/current-user` | Get the authenticated user's profile | Bearer |
-
-**Auth Flow:** Send credentials to `/api/auth/login` to receive an access token and a refresh token. Include the access token as a `Bearer` token in the `Authorization` header for all protected requests. When the access token expires, use `/api/auth/refresh` with the refresh token to obtain a new pair.
-
-### Parking Management
-
-| Method   | Endpoint                                                | Description                                 | Auth   |
-|----------|---------------------------------------------------------|---------------------------------------------|--------|
-| `GET`    | `/api/parking-spaces`                                   | List all parking spaces with current status | Bearer |
-| `POST`   | `/api/parking-spaces/{spotNumber}/releases`             | Release a spot (owner only)                 | Bearer |
-| `DELETE` | `/api/parking-spaces/{spotNumber}/releases/{releaseId}` | Revoke a release                            | Bearer |
-| `POST`   | `/api/parking-spaces/{spotNumber}/bookings`             | Book an available spot                      | Bearer |
-| `DELETE` | `/api/parking-spaces/{spotNumber}/bookings/{bookingId}` | Cancel a booking                            | Bearer |
-| `POST`   | `/api/parking-spaces/{spotNumber}/reports`              | Report a spot issue                         | Bearer |
-| `GET`    | `/api/parking-spaces/events`                            | SSE stream for real-time updates            | Bearer |
-
-### User Management (Admin only)
-
-| Method   | Endpoint              | Description       | Auth  |
-|----------|-----------------------|-------------------|-------|
-| `GET`    | `/api/users`          | List all users    | Admin |
-| `POST`   | `/api/users`          | Create a new user | Admin |
-| `GET`    | `/api/users/{userId}` | Get user details  | Admin |
-| `PUT`    | `/api/users/{userId}` | Update a user     | Admin |
-| `DELETE` | `/api/users/{userId}` | Delete a user     | Admin |
-
-### Reports (Admin only)
-
-| Method | Endpoint                  | Description                               | Auth  |
-|--------|---------------------------|-------------------------------------------|-------|
-| `GET`  | `/api/reports`            | List all parking spot reports             | Admin |
-| `PUT`  | `/api/reports/{reportId}` | Update report status (RESOLVED/DISMISSED) | Admin |
-
-### Push Notifications
-
-| Method   | Endpoint              | Description                         | Auth   |
-|----------|-----------------------|-------------------------------------|--------|
-| `GET`    | `/api/push/vapid-key` | Get VAPID public key                | Bearer |
-| `POST`   | `/api/push/subscribe` | Subscribe to push notifications     | Bearer |
-| `DELETE` | `/api/push/subscribe` | Unsubscribe from push notifications | Bearer |
-| `PUT`    | `/api/push/seeking`   | Toggle "seeking parking" status     | Bearer |
-| `GET`    | `/api/push/status`    | Get subscription status             | Bearer |
-
-### System
-
-| Method | Endpoint                | Description                  | Auth        |
-|--------|-------------------------|------------------------------|-------------|
-| `GET`  | `/api/health`           | Health check                 | Public      |
-| `GET`  | `/api/setup/status`     | Check initial setup status   | Public      |
-| `POST` | `/api/setup/verify-otp` | Verify OTP for setup         | Public      |
-| `POST` | `/api/setup/admin`      | Create initial admin account | Setup Token |
-
----
 
 ## Development
 
