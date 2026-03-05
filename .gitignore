@@ -65,3 +65,4 @@ npm-debug.log*
 
 # GitHub
 current-ticket.md
+/parver-frontend/src/main/resources/parver-frontend/dev-dist/
