@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { LogOut, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SmallParkingLot } from "@/components/parking/small-parking-lot"
+import { LargeParkingLot } from "@/components/parking/large-parking-lot"
 import { SpotDetailSheet } from "@/components/parking/spot-detail-sheet"
 import { NotificationSettings } from "@/components/parking/notification-settings"
 import { useAuth } from "@/hooks/use-auth"
@@ -110,14 +111,9 @@ export default function ParkingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
-              className="flex w-full flex-col items-center justify-center py-20"
+              className="w-full"
             >
-              <p className="text-lg font-semibold text-muted-foreground">
-                Coming Soon
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground/60">
-                Die gro&szlig;e Parkfl&auml;che wird bald verf&uuml;gbar sein.
-              </p>
+              <LargeParkingLot onSpotClick={setSelectedSpot} refreshKey={refreshKey} spaces={liveSpaces} />
             </motion.div>
           )}
         </AnimatePresence>
