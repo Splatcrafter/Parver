@@ -1,0 +1,35 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: parver-db
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: parver
+      MARIADB_USER: parver
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - parver-data:/var/lib/mysql
+    restart: unless-stopped
+
+  parver:
+    image: ghcr.io/splatgames/parver:latest
+    container_name: parver-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_NAME=parver
+      - DB_USERNAME=parver
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - VAPID_SUBJECT=${VAPID_SUBJECT}
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+volumes:
+  parver-data:
