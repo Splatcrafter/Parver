@@ -65,4 +65,6 @@ public interface ParkingSpotService {
     java.util.List<ParkingSpotReportEntity> getAllReports();
 
     void updateReportStatus(long reportId, @NotNull ReportStatus status);
+
+    void deleteReportsByReporter(long reporterId);
 }

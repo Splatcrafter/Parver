@@ -11,4 +11,6 @@ public interface ParkingSpotReportRepository extends JpaRepository<ParkingSpotRe
 
     @NotNull
     List<ParkingSpotReportEntity> findAllByOrderByCreatedAtDesc();
+
+    void deleteByReporterId(long reporterId);
 }
