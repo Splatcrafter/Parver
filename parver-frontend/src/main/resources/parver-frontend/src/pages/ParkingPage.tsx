@@ -8,6 +8,7 @@ import { LargeParkingLot } from "@/components/parking/large-parking-lot"
 import { SpotDetailSheet } from "@/components/parking/spot-detail-sheet"
 import { NotificationSettings } from "@/components/parking/notification-settings"
 import { useAuth } from "@/hooks/use-auth"
+import { useOpenReportCount } from "@/hooks/use-open-report-count"
 import { useSSE } from "@/hooks/use-sse"
 import { cn } from "@/lib/utils"
 import type { components } from "@/lib/api-types"
@@ -22,6 +23,7 @@ export default function ParkingPage() {
   const [liveSpaces, setLiveSpaces] = useState<ParkingSpace[] | undefined>(undefined)
   const { user, isAdmin, logout } = useAuth()
   const navigate = useNavigate()
+  const openReportCount = useOpenReportCount()
 
   const handleSSEUpdate = useCallback((spaces: ParkingSpace[]) => {
     setLiveSpaces(spaces)
@@ -55,11 +57,18 @@ export default function ParkingPage() {
             {user?.displayName}
           </span>
           {isAdmin && (
-            <Button variant="ghost" size="icon-sm" asChild title="Verwaltung">
-              <Link to="/administration/users">
-                <Settings className="h-4 w-4" />
-              </Link>
-            </Button>
+            <span className="relative">
+              <Button variant="ghost" size="icon-sm" asChild title="Verwaltung">
+                <Link to="/administration/users">
+                  <Settings className="h-4 w-4" />
+                </Link>
+              </Button>
+              {openReportCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold leading-none text-white">
+                  +{openReportCount}
+                </span>
+              )}
+            </span>
           )}
           <Button variant="ghost" size="icon-sm" onClick={handleLogout} title="Abmelden">
             <LogOut className="h-4 w-4" />
