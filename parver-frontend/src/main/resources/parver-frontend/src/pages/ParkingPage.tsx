@@ -16,7 +16,7 @@ type ParkingArea = "small" | "large"
 type ParkingSpace = components["schemas"]["ParkingSpace"]
 
 export default function ParkingPage() {
-  const [activeArea, setActiveArea] = useState<ParkingArea>("small")
+  const [activeArea, setActiveArea] = useState<ParkingArea>("large")
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpace | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [liveSpaces, setLiveSpaces] = useState<ParkingSpace[] | undefined>(undefined)
