@@ -16,6 +16,7 @@ import { CreateUserDialog } from "@/components/admin/create-user-dialog"
 import { EditUserDialog } from "@/components/admin/edit-user-dialog"
 import { DeleteUserDialog } from "@/components/admin/delete-user-dialog"
 import { useAuth } from "@/hooks/use-auth"
+import { useOpenReportCount } from "@/hooks/use-open-report-count"
 import { usersApi } from "@/lib/api"
 import type { components } from "@/lib/api-types"
 
@@ -24,6 +25,7 @@ type UserResponse = components["schemas"]["UserResponse"]
 export default function AdminPage() {
   const { user: authUser, logout } = useAuth()
   const navigate = useNavigate()
+  const openReportCount = useOpenReportCount()
   const [users, setUsers] = useState<UserResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
@@ -89,6 +91,11 @@ export default function AdminPage() {
           <Link to="/administration/reports">
             <Flag className="h-4 w-4" />
             Meldungen
+            {openReportCount > 0 && (
+              <span className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold leading-none text-white">
+                +{openReportCount}
+              </span>
+            )}
           </Link>
         </Button>
         <Button size="sm" onClick={() => setCreateOpen(true)}>

@@ -67,6 +67,9 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Parkplatzverwaltung &ndash; AFBB
           </p>
+          <p className="mt-2 text-xs italic text-muted-foreground/70">
+            &bdquo;Ich steh auf deinen Parkplatz&ldquo;
+          </p>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">

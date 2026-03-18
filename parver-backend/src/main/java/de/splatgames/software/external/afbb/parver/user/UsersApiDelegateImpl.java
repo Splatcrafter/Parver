@@ -109,6 +109,9 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
             // Delete push subscription for this user
             this.pushNotificationService.unsubscribe(userId);
 
+            // Delete all reports filed by this user
+            this.parkingSpotService.deleteReportsByReporter(userId);
+
             // Delete all bookings this user made on other spots
             this.parkingSpotService.deleteBookingsByUser(userId);
 

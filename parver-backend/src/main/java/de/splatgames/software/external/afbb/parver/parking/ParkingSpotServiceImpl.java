@@ -285,6 +285,11 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
     }
 
     @Override
+    public void deleteReportsByReporter(final long reporterId) {
+        this.reportRepository.deleteByReporterId(reporterId);
+    }
+
+    @Override
     public void updateReportStatus(final long reportId, @NotNull final ReportStatus status) {
         final ParkingSpotReportEntity report = this.reportRepository.findById(reportId)
                 .orElseThrow(() -> new NoSuchElementException("Report not found: " + reportId));
