@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react"
+import { apiClient } from "@/lib/api"
 import type { components } from "@/lib/api-types"
 
 type ParkingSpace = components["schemas"]["ParkingSpace"]
@@ -48,11 +49,14 @@ export function useSSE(onUpdate: (spaces: ParkingSpace[]) => void) {
       eventSource.close()
       eventSourceRef.current = null
 
-      // Exponential backoff reconnect
+      // Exponential backoff reconnect with token refresh
       const delay = reconnectDelayRef.current
       reconnectDelayRef.current = Math.min(delay * 2, MAX_RECONNECT_DELAY)
 
-      reconnectTimeoutRef.current = setTimeout(connect, delay)
+      reconnectTimeoutRef.current = setTimeout(async () => {
+        await apiClient.tryRefresh()
+        connect()
+      }, delay)
     }
 
     eventSource.onopen = () => {
@@ -74,6 +78,23 @@ export function useSSE(onUpdate: (spaces: ParkingSpace[]) => void) {
         reconnectTimeoutRef.current = null
       }
     }
+  }, [connect])
+
+  // Reconnect with fresh token when a proactive refresh happens
+  useEffect(() => {
+    const unsubscribe = apiClient.onTokenRefreshed(() => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+        eventSourceRef.current = null
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
+      }
+      reconnectDelayRef.current = INITIAL_RECONNECT_DELAY
+      connect()
+    })
+    return unsubscribe
   }, [connect])
 
   return { connected }

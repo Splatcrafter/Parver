@@ -1,6 +1,9 @@
 const BASE_URL = "/api"
 
 class ApiClient {
+  private refreshPromise: Promise<boolean> | null = null
+  private tokenRefreshListeners: Array<(expiresIn: number) => void> = []
+
   private getAccessToken(): string | null {
     return localStorage.getItem("parver_access_token")
   }
@@ -9,9 +12,12 @@ class ApiClient {
     return localStorage.getItem("parver_refresh_token")
   }
 
-  setTokens(accessToken: string, refreshToken: string): void {
+  setTokens(accessToken: string, refreshToken: string, expiresIn?: number): void {
     localStorage.setItem("parver_access_token", accessToken)
     localStorage.setItem("parver_refresh_token", refreshToken)
+    if (expiresIn != null) {
+      this.notifyTokenRefreshed(expiresIn)
+    }
   }
 
   clearTokens(): void {
@@ -21,6 +27,28 @@ class ApiClient {
 
   hasTokens(): boolean {
     return this.getAccessToken() !== null
+  }
+
+  getAccessTokenExpiry(): number | null {
+    const token = this.getAccessToken()
+    if (!token) return null
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]))
+      return payload.exp ?? null
+    } catch {
+      return null
+    }
+  }
+
+  onTokenRefreshed(listener: (expiresIn: number) => void): () => void {
+    this.tokenRefreshListeners.push(listener)
+    return () => {
+      this.tokenRefreshListeners = this.tokenRefreshListeners.filter((l) => l !== listener)
+    }
+  }
+
+  private notifyTokenRefreshed(expiresIn: number): void {
+    this.tokenRefreshListeners.forEach((l) => l(expiresIn))
   }
 
   async fetch(path: string, options: RequestInit = {}): Promise<Response> {
@@ -46,7 +74,20 @@ class ApiClient {
     return response
   }
 
-  private async tryRefresh(): Promise<boolean> {
+  async tryRefresh(): Promise<boolean> {
+    if (this.refreshPromise) {
+      return this.refreshPromise
+    }
+
+    this.refreshPromise = this.doRefresh()
+    try {
+      return await this.refreshPromise
+    } finally {
+      this.refreshPromise = null
+    }
+  }
+
+  private async doRefresh(): Promise<boolean> {
     const refreshToken = this.getRefreshToken()
     if (!refreshToken) return false
 
@@ -62,7 +103,7 @@ class ApiClient {
     }
 
     const data = await response.json()
-    this.setTokens(data.accessToken, data.refreshToken)
+    this.setTokens(data.accessToken, data.refreshToken, data.expiresIn)
     return true
   }
 }

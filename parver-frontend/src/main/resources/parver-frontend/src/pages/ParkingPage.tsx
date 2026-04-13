@@ -7,6 +7,7 @@ import { SmallParkingLot } from "@/components/parking/small-parking-lot"
 import { LargeParkingLot } from "@/components/parking/large-parking-lot"
 import { SpotDetailSheet } from "@/components/parking/spot-detail-sheet"
 import { NotificationSettings } from "@/components/parking/notification-settings"
+import { UpcomingReleases } from "@/components/parking/upcoming-releases"
 import { useAuth } from "@/hooks/use-auth"
 import { useOpenReportCount } from "@/hooks/use-open-report-count"
 import { useSSE } from "@/hooks/use-sse"
@@ -137,6 +138,11 @@ export default function ParkingPage() {
           <NotificationSettings />
         </div>
       )}
+
+      {/* Upcoming Releases */}
+      <div className="mt-6 w-full max-w-2xl">
+        <UpcomingReleases spaces={liveSpaces} />
+      </div>
 
       {/* Spot Detail Sheet */}
       <SpotDetailSheet
